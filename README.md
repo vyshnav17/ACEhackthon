@@ -56,9 +56,11 @@ job-ready-ai/
     └── routes/      # Market & Assessment Endpoints
 ```
 
-## 👥 Team
-[USER: PLEASE ENTER CUSTOM TEAM DATA HERE]
-- **Team Name**: [Pending]
-- **Members**: [Pending]
-- **Hackathon**: [Pending]
+## 🎯 Problem Statement
+**Skill Gap Detection and Employment Readiness**
+
+Job seekers often struggle to align their skillsets with rapidly evolving industry requirements. JobReady.AI solves this by providing precise detection of skill gaps and a data-driven path to employability.
+
+## 👥 Team: **Coconut Coders**
+- **Members**: Vyshnav, Sheik Nayaz, Srajan, Vinayak
 
