@@ -1,69 +1,120 @@
 @import "tailwindcss";
 
+/* Note: Unknown at-rule errors (@theme, @utility, @apply) below are due to 
+   Tailwind CSS v4 experimental syntax not being fully recognized by some linters. 
+   These are valid and required for the new design system. */
 @theme {
-  --color-background: #020617;
-  --color-foreground: #f8fafc;
-  
-  --color-brand-primary: #6366f1;
-  --color-brand-secondary: #a855f7;
-  --color-brand-accent: #38bdf8;
+  --color-background: #FFFFFF;
+  --color-foreground: #111111;
 
-  --animate-blob: blob 7s infinite;
-  --animate-float: float 6s ease-in-out infinite;
-  --animate-glow: glow 2s ease-in-out infinite alternate;
+  --color-brand-primary: #2D5BFF;
+  --color-brand-secondary: #000000;
+  --color-brand-accent: #E9ECEF;
 
-  @keyframes blob {
-    0% { transform: translate(0px, 0px) scale(1); }
-    33% { transform: translate(30px, -50px) scale(1.1); }
-    66% { transform: translate(-20px, 20px) scale(0.9); }
-    100% { transform: translate(0px, 0px) scale(1); }
-  }
+  --radius-bento: 16px;
+}
 
-  @keyframes float {
-    0% { transform: translateY(0px); }
-    50% { transform: translateY(-20px); }
-    100% { transform: translateY(0px); }
-  }
+/* Bento Design System */
+@utility bento-card {
+  @apply bg-[#F8F9FA] border border-[#E9ECEF] rounded-[var(--radius-bento)];
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.02), 0 1px 2px -1px rgba(0, 0, 0, 0.02);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
 
-  @keyframes glow {
-    from { box-shadow: 0 0 10px -10px #6366f1; }
-    to { box-shadow: 0 0 20px 5px #6366f1; }
+@utility bento-blue {
+  @apply bg-[#F0F4FF] border-[#D0DFFF];
+}
+
+@utility bento-gray {
+  @apply bg-[#F1F3F5] border-[#E9ECEF];
+}
+
+@utility bento-indigo {
+  @apply bg-[#F3F0FF] border-[#E5DBFF];
+}
+
+@utility bento-emerald {
+  @apply bg-[#F0FFF4] border-[#D1FAE5];
+}
+
+@utility bento-card-hover {
+  @apply hover:border-[#DEE2E6] hover:shadow-lg transition-all duration-300;
+
+  &:hover {
+    transform: translateY(-2px);
   }
 }
 
-/* Utilities */
 @utility glass {
-  @apply bg-white/5 backdrop-blur-lg border border-white/10 shadow-xl;
+  @apply bg-white/80 backdrop-blur-md border border-white/20;
 }
 
-@utility glass-hover {
-  @apply hover:bg-white/10 hover:border-white/20 transition-all duration-300;
+@utility industrial-border {
+  border: 1px solid #E9ECEF;
 }
 
 @utility text-gradient {
-  @apply bg-clip-text text-transparent bg-gradient-to-r from-brand-primary via-brand-secondary to-brand-accent;
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-[#111111] to-[#495057];
 }
 
-@utility bg-mesh {
-  background-color: var(--color-background);
-  background-image: 
-    radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
-    radial-gradient(at 100% 0%, rgba(168, 85, 247, 0.15) 0px, transparent 50%),
-    radial-gradient(at 100% 100%, rgba(56, 189, 248, 0.15) 0px, transparent 50%),
-    radial-gradient(at 0% 100%, rgba(99, 102, 241, 0.15) 0px, transparent 50%);
+@utility animate-fade-in {
+  animation: fadeIn 0.4s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 body {
-  @apply bg-mesh text-foreground min-h-screen selection:bg-brand-primary/30 selection:text-white;
+  @apply bg-background text-foreground min-h-screen selection:bg-brand-primary selection:text-white;
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Modern Typography */
+h1,
+h2,
+h3 {
+  letter-spacing: -0.02em;
 }
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 10px;
+  width: 8px;
 }
+
 ::-webkit-scrollbar-track {
-  @apply bg-background;
+  background: #F8F9FA;
 }
+
 ::-webkit-scrollbar-thumb {
-  @apply bg-white/10 rounded-full hover:bg-white/20;
+  background: #DEE2E6;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #CED4DA;
+}
+
+/* Animation utilities */
+.reveal {
+  animation: reveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes reveal {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+
+  to {
+    clip-path: inset(0 0 0 0);
+  }
 }

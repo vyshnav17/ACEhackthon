@@ -14,15 +14,26 @@ export default function SkillAssessmentForm({ onComplete }: { onComplete: (resul
     // Resume State
     const [mode, setMode] = useState<'manual' | 'resume'>('manual');
     const [resumeFile, setResumeFile] = useState<File | null>(null);
+    const [customRole, setCustomRole] = useState('');
+    const [isCustomRole, setIsCustomRole] = useState(false);
 
     useEffect(() => {
         api.get('/jobs').then(data => setJobs(data));
     }, []);
 
     const handleJobSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        const job = jobs.find(j => j.id === e.target.value);
-        setSelectedJob(job);
-        setSkillsMap({});
+        const value = e.target.value;
+        if (value === 'custom') {
+            setSelectedJob(null);
+            setIsCustomRole(true);
+            setSkillsMap({});
+        } else {
+            const job = jobs.find(j => j.id === value);
+            setSelectedJob(job);
+            setIsCustomRole(false);
+            setCustomRole('');
+            setSkillsMap({});
+        }
     };
 
     const handleSkillToggle = (skillName: string) => {
@@ -44,7 +55,12 @@ export default function SkillAssessmentForm({ onComplete }: { onComplete: (resul
                 // Resume Upload Flow
                 const formData = new FormData();
                 formData.append('resume', resumeFile);
-                if (selectedJob) formData.append('jobRole', selectedJob.title);
+                if (isCustomRole && customRole) {
+                    formData.append('jobRole', customRole);
+                } else if (selectedJob) {
+                    formData.append('jobRole', selectedJob.title);
+                }
+                if (user?.id) formData.append('userId', user.id);
 
                 // Use fetch directly for FormData to avoid header issues in wrapper
                 const token = localStorage.getItem('token');
@@ -53,9 +69,14 @@ export default function SkillAssessmentForm({ onComplete }: { onComplete: (resul
                     headers: { 'Authorization': `Bearer ${token}` }, // Add auth if needed
                     body: formData
                 });
-                result = await res.json();
 
-                if (!res.ok) throw new Error(result.message || result.error || 'Upload failed');
+                if (!res.ok) {
+                    const errorText = await res.text();
+                    console.error("Upload failed raw:", errorText);
+                    throw new Error(`Upload failed: ${res.status} ${res.statusText}`);
+                }
+
+                result = await res.json();
 
             } else {
                 // Manual Checkbox Flow
@@ -77,73 +98,93 @@ export default function SkillAssessmentForm({ onComplete }: { onComplete: (resul
     };
 
     return (
-        <div className="glass p-8 rounded-2xl border border-white/10 shadow-lg relative overflow-hidden">
-            {/* Decorative */}
-            <div className="absolute top-0 right-0 w-32 h-32 bg-brand-primary/10 rounded-full blur-[40px] pointer-events-none" />
+        <div className="bento-card p-8 h-full">
+            {/* Header */}
+            <div className="flex flex-col gap-6 mb-8">
+                <div>
+                    <h2 className="text-3xl font-black text-[#111111] flex items-center gap-3 tracking-tighter uppercase">
+                        Analysis
+                    </h2>
+                    <p className="text-[#495057] mt-1 font-medium">Define your target trajectory.</p>
+                </div>
 
-            <div className="flex justify-between items-start mb-6">
-                <h2 className="text-2xl font-bold text-white flex items-center gap-2">
-                    <Briefcase className="text-brand-accent" /> Start New Assessment
-                </h2>
-
-                {/* Mode Switcher */}
-                <div className="flex bg-white/5 rounded-lg p-1 border border-white/10">
+                {/* Modern Toggle */}
+                <div className="flex bento-gray p-1 rounded-xl border self-start">
                     <button
                         onClick={() => setMode('manual')}
-                        className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${mode === 'manual' ? 'bg-brand-primary text-white shadow-lg' : 'text-gray-400 hover:text-white'}`}
+                        className={`px-6 py-2 rounded-lg text-sm font-bold transition-all ${mode === 'manual' ? 'bg-white text-[#111111] shadow-sm' : 'text-[#ADB5BD] hover:text-[#495057]'}`}
                     >
-                        Manual Check
+                        Manual
                     </button>
                     <button
                         onClick={() => setMode('resume')}
-                        className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${mode === 'resume' ? 'bg-brand-primary text-white shadow-lg' : 'text-gray-400 hover:text-white'}`}
+                        className={`px-6 py-2 rounded-lg text-sm font-bold transition-all ${mode === 'resume' ? 'bg-brand-primary text-white shadow-md' : 'text-[#ADB5BD] hover:text-[#495057]'}`}
                     >
-                        Upload Resume
+                        Resume
                     </button>
                 </div>
             </div>
 
             <div className="mb-8">
-                <label className="block text-sm font-medium text-gray-300 mb-2">Select Target Job Role (Optional)</label>
-                <div className="relative">
-                    <select
-                        className="w-full p-4 bg-white/5 border border-white/10 rounded-xl focus:ring-2 focus:ring-brand-primary/50 focus:border-brand-primary/50 outline-none text-white appearance-none cursor-pointer hover:bg-white/10 transition-colors"
-                        onChange={handleJobSelect}
-                        defaultValue=""
-                    >
-                        <option value="" className="bg-slate-900 text-gray-400">General Analysis (No specific role)</option>
-                        {jobs.map(job => (
-                            <option key={job.id} value={job.id} className="bg-slate-900 text-white">{job.title}</option>
-                        ))}
-                    </select>
-                    <ChevronDown className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" />
+                <label className="text-[10px] font-black text-[#ADB5BD] uppercase tracking-widest block mb-2">Target Role</label>
+                <div className="space-y-4">
+                    <div className="relative group/select">
+                        <select
+                            className="w-full p-4 pl-5 pr-16 bg-[#F8F9FA] border border-[#E9ECEF] rounded-xl focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary outline-none text-[#111111] appearance-none cursor-pointer transition-all hover:bg-[#EEF2F7] text-lg font-bold tracking-tight"
+                            onChange={handleJobSelect}
+                            value={isCustomRole ? 'custom' : (selectedJob?.id || "")}
+                        >
+                            <option value="" className="text-[#ADB5BD]">General Analysis (AI Decides)</option>
+                            {jobs.map(job => (
+                                <option key={job.id} value={job.id}>{job.title}</option>
+                            ))}
+                            <option value="custom" className="font-bold">✨ Type Custom Role...</option>
+                        </select>
+                        <div className="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none text-[#ADB5BD] group-hover/select:text-[#111111] transition-colors">
+                            <ChevronDown size={20} />
+                        </div>
+                    </div>
+
+                    {/* Custom Role Input */}
+                    {isCustomRole && (
+                        <div className="animate-in fade-in slide-in-from-top-2 duration-300">
+                            <input
+                                type="text"
+                                placeholder="e.g. Graphic Designer, Chef..."
+                                value={customRole}
+                                onChange={(e) => setCustomRole(e.target.value)}
+                                className="w-full p-4 bg-white border-2 border-brand-primary rounded-xl outline-none text-[#111111] placeholder-[#ADB5BD] font-bold"
+                                autoFocus
+                            />
+                        </div>
+                    )}
                 </div>
             </div>
 
             {/* RESUME UPLOAD MODE */}
             {mode === 'resume' && (
-                <div className="animate-in fade-in slide-in-from-right-4 duration-300">
-                    <div className="border-2 border-dashed border-white/20 rounded-xl p-8 text-center hover:bg-white/5 transition-colors group cursor-pointer relative">
+                <div className="animate-in fade-in slide-in-from-right-4 duration-500">
+                    <div className="bento-indigo border rounded-2xl p-10 text-center hover:border-brand-primary transition-all group cursor-pointer relative">
                         <input
                             type="file"
                             accept=".pdf,.txt"
                             onChange={handleFileChange}
-                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                         />
                         <div className="flex flex-col items-center gap-4">
-                            <div className="w-16 h-16 bg-brand-primary/10 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
-                                {resumeFile ? <FileText className="text-brand-primary" size={32} /> : <Upload className="text-brand-primary" size={32} />}
+                            <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center shadow-sm border border-[#E9ECEF] group-hover:scale-105 transition-transform duration-300">
+                                {resumeFile ? <FileText className="text-green-600" size={24} /> : <Upload className="text-brand-primary" size={24} />}
                             </div>
-                            <div>
+                            <div className="space-y-1">
                                 {resumeFile ? (
                                     <>
-                                        <p className="font-bold text-white text-lg">{resumeFile.name}</p>
-                                        <p className="text-sm text-green-400 mt-1">Ready to analyze</p>
+                                        <p className="font-bold text-[#111111]">{resumeFile.name}</p>
+                                        <p className="text-xs text-green-600 font-bold uppercase tracking-widest">Ready to analyze</p>
                                     </>
                                 ) : (
                                     <>
-                                        <p className="font-bold text-white text-lg">Drop your resume here</p>
-                                        <p className="text-gray-400 text-sm mt-1">Supports PDF or TXT (Max 5MB)</p>
+                                        <p className="font-bold text-[#111111]">Select Resume</p>
+                                        <p className="text-[#ADB5BD] text-xs">PDF or TXT (Max 5MB)</p>
                                     </>
                                 )}
                             </div>
@@ -153,49 +194,43 @@ export default function SkillAssessmentForm({ onComplete }: { onComplete: (resul
                     <button
                         onClick={handleSubmit}
                         disabled={loading || !resumeFile}
-                        className="mt-8 w-full py-4 bg-gradient-to-r from-brand-primary to-brand-secondary text-white rounded-xl font-bold text-lg shadow-lg hover:shadow-brand-primary/25 hover:scale-[1.01] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed group"
+                        className="mt-8 w-full py-5 bg-[#111111] text-white rounded-xl font-black text-lg hover:bg-black transition-all disabled:opacity-30 disabled:cursor-not-allowed"
                     >
-                        {loading ? (
-                            <span className="flex items-center justify-center gap-2">
-                                <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                Analyzing with Groq AI...
-                            </span>
-                        ) : (
-                            <span className="flex items-center justify-center gap-2">
-                                Analyze Resume Impact <Upload size={18} className="group-hover:-translate-y-1 transition-transform" />
-                            </span>
-                        )}
+                        {loading ? 'Analyzing...' : 'Analyze Now'}
                     </button>
                 </div>
             )}
 
             {/* MANUAL MODE */}
             {mode === 'manual' && (
-                <div className="animate-in fade-in slide-in-from-left-4 duration-300">
+                <div className="animate-in fade-in slide-in-from-left-4 duration-500">
                     {!selectedJob ? (
-                        <div className="text-center p-8 text-gray-500">
-                            Please select a job role above to verify your skills manually.
+                        <div className="text-center p-12 text-[#ADB5BD] bg-[#F8F9FA] rounded-2xl border border-[#E9ECEF] border-dashed">
+                            <p className="font-bold text-sm">Select a role to verify skills manually.</p>
                         </div>
                     ) : (
                         <>
-                            <h3 className="text-lg font-semibold mb-4 text-brand-primary">Verify your skills:</h3>
-                            <div className="space-y-6">
+                            <h3 className="text-sm font-black mb-6 text-[#111111] uppercase tracking-widest flex items-center gap-2">
+                                <div className="w-1 h-4 bg-brand-primary rounded-full" />
+                                Skill Verification
+                            </h3>
+                            <div className="space-y-4">
                                 {['Technical', 'Tools', 'Soft', 'Portfolio'].map(cat => (
-                                    <div key={cat} className="bg-white/5 p-4 rounded-xl border border-white/5">
-                                        <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 border-b border-white/10 pb-2">{cat}</h4>
+                                    <div key={cat} className="p-4 rounded-xl border bento-blue">
+                                        <h4 className="text-[10px] font-black text-[#ADB5BD] uppercase tracking-widest mb-4">{cat}</h4>
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                             {selectedJob.skills.filter((s: any) => s.category === cat).map((s: any) => (
-                                                <label key={s.name} className={`flex items-center space-x-3 p-3 rounded-lg cursor-pointer transition-all duration-200 border ${skillsMap[s.name] ? 'bg-brand-primary/20 border-brand-primary/30' : 'hover:bg-white/5 border-transparent'}`}>
-                                                    <div className={`w-5 h-5 rounded flex items-center justify-center transition-colors ${skillsMap[s.name] ? 'bg-brand-primary text-white' : 'bg-white/10 text-transparent'}`}>
-                                                        <Check size={14} />
+                                                <label key={s.name} className={`flex items-center space-x-3 p-3 rounded-xl cursor-pointer transition-all border ${skillsMap[s.name] ? 'bg-brand-primary/5 border-brand-primary/20' : 'bg-[#F8F9FA] border-transparent hover:border-[#E9ECEF]'}`}>
+                                                    <div className={`w-4 h-4 rounded flex items-center justify-center transition-all ${skillsMap[s.name] ? 'bg-brand-primary text-white' : 'bg-white border border-[#DEE2E6]'}`}>
+                                                        {skillsMap[s.name] && <Check size={10} strokeWidth={4} />}
                                                     </div>
                                                     <input
                                                         type="checkbox"
                                                         checked={!!skillsMap[s.name]}
                                                         onChange={() => handleSkillToggle(s.name)}
-                                                        className="hidden" // Hiding default checkbox
+                                                        className="hidden"
                                                     />
-                                                    <span className="text-sm text-gray-200 select-none">{s.name}</span>
+                                                    <span className={`text-xs font-bold ${skillsMap[s.name] ? 'text-[#111111]' : 'text-[#495057]'}`}>{s.name}</span>
                                                 </label>
                                             ))}
                                         </div>
@@ -206,14 +241,9 @@ export default function SkillAssessmentForm({ onComplete }: { onComplete: (resul
                             <button
                                 onClick={handleSubmit}
                                 disabled={loading}
-                                className="mt-8 w-full py-4 bg-gradient-to-r from-brand-primary to-brand-secondary text-white rounded-xl font-bold text-lg shadow-lg hover:shadow-brand-primary/25 hover:scale-[1.01] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="mt-8 w-full py-5 bg-[#111111] text-white rounded-xl font-black text-lg hover:bg-black transition-all disabled:opacity-30"
                             >
-                                {loading ? (
-                                    <span className="flex items-center justify-center gap-2">
-                                        <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                        Calculating Score...
-                                    </span>
-                                ) : 'Generate Compatibility Report'}
+                                {loading ? 'Processing...' : 'Generate Report'}
                             </button>
                         </>
                     )}

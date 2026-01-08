@@ -57,7 +57,7 @@ router.post('/upload', upload.single('resume'), async (req, res) => {
 
         // 2. Analyze with AI
         // jobRole can be passed in body if user selected one, else generic
-        const jobRole = req.body.jobRole || 'Software Engineer';
+        const jobRole = req.body.jobRole;
         console.log("Analyzing with AI for role:", jobRole);
         const aiResult = await resumeService.analyzeWithAI(text, jobRole);
         console.log("AI Analysis complete.");
@@ -65,8 +65,25 @@ router.post('/upload', upload.single('resume'), async (req, res) => {
         // 3. Cleanup file
         fs.unlinkSync(req.file.path);
 
-        // 4. Return result
-        res.json(aiResult);
+        // 4. Save result
+        const assessmentId = Date.now().toString();
+
+        const userId = req.body.userId || 'anonymous';
+        console.log(`Saving assessment ${assessmentId} for user ${userId}`);
+
+        resultsDb.create({
+            id: assessmentId,
+            userId: req.body.userId,
+            role: aiResult.role,
+            date: new Date().toISOString(),
+            score: aiResult.score,
+            type: 'resume_analysis',
+            data: aiResult
+        });
+
+
+        // 5. Return result with ID
+        res.json({ ...aiResult, id: assessmentId });
 
     } catch (err) {
         console.error("Upload Error:", err);
@@ -82,6 +99,14 @@ router.post('/upload', upload.single('resume'), async (req, res) => {
 router.get('/history/:userId', (req, res) => {
     const history = resultsDb.filterBy(r => r.userId === req.params.userId);
     res.json(history);
+});
+
+// Get single result
+router.get('/:id', (req, res) => {
+    console.log("Fetching assessment:", req.params.id);
+    const result = resultsDb.getById(req.params.id);
+    if (!result) return res.status(404).json({ message: 'Assessment not found' });
+    res.json(result);
 });
 
 module.exports = router;

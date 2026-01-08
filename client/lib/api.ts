@@ -8,6 +8,11 @@ export const api = {
                 'Authorization': `Bearer ${localStorage.getItem('token')}`
             }
         });
+        if (!res.ok) {
+            const text = await res.text();
+            console.error(`API Parse Error [GET ${endpoint}]:`, text);
+            try { return JSON.parse(text); } catch (e) { throw new Error(text); }
+        }
         return res.json();
     },
 
@@ -20,6 +25,11 @@ export const api = {
             },
             body: JSON.stringify(body)
         });
+        if (!res.ok) {
+            const text = await res.text();
+            console.error(`API Parse Error [POST ${endpoint}]:`, text);
+            try { return JSON.parse(text); } catch (e) { throw new Error(text); }
+        }
         return res.json();
     }
 };

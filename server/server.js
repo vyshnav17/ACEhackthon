@@ -15,6 +15,7 @@ app.use(bodyParser.json());
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/jobs', require('./routes/jobs'));
 app.use('/api/assessments', require('./routes/assessments'));
+app.use('/api/interview', require('./routes/interview'));
 
 app.get('/', (req, res) => {
     res.send('JobReady.AI Backend is running');

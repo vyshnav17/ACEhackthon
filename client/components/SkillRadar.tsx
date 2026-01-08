@@ -24,15 +24,16 @@ export const SkillRadar = ({ data, labels }: { data: number[], labels: string[] 
         labels: labels,
         datasets: [
             {
-                label: 'Your Skill Level',
+                label: 'Skill Match %',
                 data: data,
-                backgroundColor: 'rgba(99, 102, 241, 0.2)', // Brand primary with opacity
-                borderColor: '#6366f1', // Brand primary solid
+                backgroundColor: 'rgba(45, 91, 255, 0.1)',
+                borderColor: '#2D5BFF',
                 borderWidth: 3,
-                pointBackgroundColor: '#fff',
-                pointBorderColor: '#6366f1',
+                pointBackgroundColor: '#2D5BFF',
+                pointBorderColor: '#fff',
                 pointHoverBackgroundColor: '#fff',
-                pointHoverBorderColor: '#6366f1',
+                pointHoverBorderColor: '#2D5BFF',
+                pointRadius: 4,
             },
         ],
     };
@@ -40,42 +41,26 @@ export const SkillRadar = ({ data, labels }: { data: number[], labels: string[] 
     const options = {
         scales: {
             r: {
-                beginAtZero: true,
-                max: 100,
-                ticks: {
-                    stepSize: 20,
-                    backdropColor: 'transparent',
-                    color: 'rgba(255, 255, 255, 0.3)',
-                    font: { size: 10 }
-                },
-                grid: {
-                    color: 'rgba(255, 255, 255, 0.05)',
-                },
-                angleLines: {
-                    color: 'rgba(255, 255, 255, 0.05)',
-                },
+                angleLines: { color: '#E9ECEF' },
+                grid: { color: '#E9ECEF' },
                 pointLabels: {
-                    color: 'rgba(255, 255, 255, 0.8)',
-                    font: {
-                        size: 12,
-                        family: "'Inter', sans-serif",
-                        weight: 'bold' as const
-                    }
-                }
+                    color: '#495057',
+                    font: { size: 10, weight: 'bold' as const }
+                },
+                ticks: { display: false, stepSize: 20 },
+                suggestedMin: 0,
+                suggestedMax: 100
             }
         },
         plugins: {
-            legend: {
-                display: false
-            }
+            legend: { display: false }
         },
         maintainAspectRatio: false
     };
 
     return (
-        // Wrapper for sizing
         <div className="w-full h-full p-2">
-            <Radar data={chartData} options={options} />
+            <Radar data={chartData} options={options as any} />
         </div>
     );
 };

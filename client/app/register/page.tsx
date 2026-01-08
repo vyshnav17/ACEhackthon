@@ -28,34 +28,27 @@ export default function Register() {
     };
 
     return (
-        <div className="min-h-screen relative pt-24 pb-12 overflow-hidden flex items-center justify-center">
-            {/* Background Blobs */}
-            <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
-                <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-brand-secondary/20 rounded-full blur-[100px] animate-blob" />
-                <div className="absolute bottom-1/4 left-1/4 w-96 h-96 bg-brand-primary/20 rounded-full blur-[100px] animate-blob animation-delay-2000" />
-            </div>
-
+        <div className="min-h-screen relative pt-24 pb-12 bg-[#F8F9FA] flex items-center justify-center">
             <Navbar />
 
-            <div className="glass p-8 rounded-2xl w-full max-w-md relative z-10 border border-white/10 shadow-2xl">
-                <div className="text-center mb-8">
-                    <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-tr from-brand-primary to-brand-secondary mb-4 shadow-lg shadow-brand-primary/30">
-                        <Sparkles className="text-white" size={24} />
+            <div className="bg-white p-10 rounded-3xl w-full max-w-md relative z-10 border border-[#E9ECEF] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.05)]">
+                <div className="text-center mb-10">
+                    <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-[#111111] text-white mb-6 shadow-sm">
+                        <Sparkles size={28} />
                     </div>
-                    <h1 className="text-3xl font-bold mb-2 text-white">Create Account</h1>
-                    <p className="text-gray-400">Join thousands of job seekers improving their skills</p>
+                    <h1 className="text-4xl font-black mb-3 text-[#111111] uppercase tracking-tighter leading-none">Enroll</h1>
+                    <p className="text-[10px] font-black text-[#ADB5BD] uppercase tracking-[0.3em]">Join the Core Network</p>
                 </div>
 
-                {error && <div className="p-3 mb-6 text-red-200 bg-red-500/20 border border-red-500/30 rounded-lg text-sm text-center">{error}</div>}
+                {error && <div className="p-4 mb-8 text-red-600 bg-red-50 border border-red-100 rounded-xl text-xs font-bold text-center uppercase tracking-widest leading-relaxed">System: {error}</div>}
 
                 <form onSubmit={handleSubmit} className="space-y-5">
                     <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-2">Full Name</label>
-                        <div className="relative group">
-                            <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-brand-primary transition-colors" size={18} />
+                        <label className="block text-[10px] font-black text-[#111111] mb-2 uppercase tracking-widest">Full Identity</label>
+                        <div className="relative">
                             <input
                                 type="text"
-                                className="w-full pl-10 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:ring-2 focus:ring-brand-primary/50 focus:border-brand-primary/50 outline-none text-white placeholder-gray-500 transition-all"
+                                className="w-full px-5 py-4 bg-[#F8F9FA] border border-[#E9ECEF] rounded-2xl focus:ring-4 focus:ring-brand-primary/5 focus:border-brand-primary outline-none text-[#111111] placeholder-[#ADB5BD] font-bold text-sm transition-all"
                                 placeholder="John Doe"
                                 value={name}
                                 onChange={e => setName(e.target.value)}
@@ -64,13 +57,12 @@ export default function Register() {
                         </div>
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-2">Email Address</label>
-                        <div className="relative group">
-                            <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-brand-primary transition-colors" size={18} />
+                        <label className="block text-[10px] font-black text-[#111111] mb-2 uppercase tracking-widest">Email Identity</label>
+                        <div className="relative">
                             <input
                                 type="email"
-                                className="w-full pl-10 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:ring-2 focus:ring-brand-primary/50 focus:border-brand-primary/50 outline-none text-white placeholder-gray-500 transition-all"
-                                placeholder="you@example.com"
+                                className="w-full px-5 py-4 bg-[#F8F9FA] border border-[#E9ECEF] rounded-2xl focus:ring-4 focus:ring-brand-primary/5 focus:border-brand-primary outline-none text-[#111111] placeholder-[#ADB5BD] font-bold text-sm transition-all"
+                                placeholder="name@domain.com"
                                 value={email}
                                 onChange={e => setEmail(e.target.value)}
                                 required
@@ -78,12 +70,11 @@ export default function Register() {
                         </div>
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-2">Password</label>
-                        <div className="relative group">
-                            <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-brand-primary transition-colors" size={18} />
+                        <label className="block text-[10px] font-black text-[#111111] mb-2 uppercase tracking-widest">Passcode</label>
+                        <div className="relative">
                             <input
                                 type="password"
-                                className="w-full pl-10 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:ring-2 focus:ring-brand-primary/50 focus:border-brand-primary/50 outline-none text-white placeholder-gray-500 transition-all"
+                                className="w-full px-5 py-4 bg-[#F8F9FA] border border-[#E9ECEF] rounded-2xl focus:ring-4 focus:ring-brand-primary/5 focus:border-brand-primary outline-none text-[#111111] placeholder-[#ADB5BD] font-bold text-sm transition-all"
                                 placeholder="••••••••"
                                 value={password}
                                 onChange={e => setPassword(e.target.value)}
@@ -92,13 +83,13 @@ export default function Register() {
                         </div>
                     </div>
 
-                    <button className="w-full py-3.5 bg-gradient-to-r from-brand-primary to-brand-secondary text-white rounded-xl font-bold shadow-lg hover:shadow-brand-primary/25 hover:scale-[1.02] transition-all duration-200 flex items-center justify-center gap-2">
-                        Create Account <ArrowRight size={18} />
+                    <button className="w-full py-4 bg-[#111111] text-white rounded-2xl font-black text-sm uppercase tracking-[0.2em] shadow-lg shadow-black/10 hover:shadow-black/20 hover:scale-[1.01] transition-all duration-300 flex items-center justify-center gap-2">
+                        Execute <ArrowRight size={16} />
                     </button>
 
-                    <div className="text-center mt-6">
-                        <p className="text-sm text-gray-400">
-                            Already have an account? <Link href="/login" className="text-brand-accent hover:text-white font-medium transition-colors">Login instead</Link>
+                    <div className="text-center mt-10">
+                        <p className="text-[10px] font-black text-[#ADB5BD] uppercase tracking-widest">
+                            Member already? <Link href="/login" className="text-brand-primary hover:underline">Sign In</Link>
                         </p>
                     </div>
                 </form>

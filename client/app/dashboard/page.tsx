@@ -1,157 +1,309 @@
 "use client";
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import Navbar from '../../components/Navbar';
 import SkillAssessmentForm from '../../components/SkillAssessmentForm';
 import { SkillRadar } from '../../components/SkillRadar';
-import { CheckCircle2, AlertCircle, ArrowRight, Trophy, Sparkles } from 'lucide-react';
+import MockInterviewModal from '../../components/MockInterviewModal';
+import { CheckCircle2, AlertCircle, ArrowRight, Trophy, Sparkles, Youtube, ExternalLink, Copy, Download, TrendingUp, Map, LayoutDashboard, User, LogOut, History as HistoryIcon } from 'lucide-react';
 import { api } from '../../lib/api';
+import { useReactToPrint } from 'react-to-print';
+import { ResumeTemplate } from '../../components/ResumeTemplate';
+import { MarketPulse } from '../../components/MarketPulse';
+import { JobPortal } from '../../components/JobPortal';
+import { HistorySidebar } from '../../components/HistorySidebar';
+import { History } from 'lucide-react';
 
 export default function Dashboard() {
     const { user, loading: authLoading } = useAuth();
     const [result, setResult] = useState<any>(null);
     const [showForm, setShowForm] = useState(true);
+    const [isInterviewOpen, setIsInterviewOpen] = useState(false);
+    const [showHistory, setShowHistory] = useState(false);
+    const [greeting, setGreeting] = useState('');
 
-    // Categories for radar chart
+    const componentRef = useRef<HTMLDivElement>(null);
+    const handlePrint = useReactToPrint({
+        contentRef: componentRef,
+        documentTitle: `Optimized_Resume_${result?.role || 'JobReady'}`,
+    });
+
+    // Dynamic Greeting
+    useEffect(() => {
+        const hour = new Date().getHours();
+        if (hour < 12) setGreeting('Good Morning');
+        else if (hour < 18) setGreeting('Good Afternoon');
+        else setGreeting('Good Evening');
+    }, []);
+
+    // Helper for circular progress
+    const radius = 60;
+    const circumference = 2 * Math.PI * radius;
+    const progressOffset = result ? circumference - (result.score / 100) * circumference : circumference;
+
     const radarLabels = ['Technical', 'Tools', 'Soft', 'Portfolio'];
-
-    // Helper to process result for chart
     const getChartData = () => {
         if (!result) return [0, 0, 0, 0];
-        // This is a simplification.
-        return [
-            result.score,
-            Math.min(100, result.score + 10),
-            Math.min(100, result.score + 5),
-            Math.min(100, result.score - 5)
-        ];
+
+        // Use Real AI Scores
+        if (result.skill_scores) {
+            return [
+                result.skill_scores.technical || 50,
+                result.skill_scores.tools || 50,
+                result.skill_scores.soft || 50,
+                result.skill_scores.portfolio || 50
+            ];
+        }
+
+        return [result.score, Math.min(100, result.score + 10), Math.min(100, result.score + 5), Math.min(100, result.score - 5)];
     };
 
     if (authLoading) return (
-        <div className="min-h-screen flex items-center justify-center">
-            <div className="animate-spin w-8 h-8 border-2 border-brand-primary border-t-transparent rounded-full"></div>
+        <div className="min-h-screen flex items-center justify-center bg-background">
+            <div className="relative">
+                <div className="w-16 h-16 border-4 border-brand-primary/30 border-t-brand-primary rounded-full animate-spin"></div>
+                <div className="absolute inset-0 flex items-center justify-center">
+                    <Sparkles size={20} className="text-brand-accent animate-pulse" />
+                </div>
+            </div>
         </div>
     );
 
     return (
-        <div className="min-h-screen relative pb-12">
-
-            {/* Background elements */}
-            <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
-                <div className="absolute top-32 left-10 w-64 h-64 bg-brand-primary/10 rounded-full blur-[80px]" />
-                <div className="absolute bottom-10 right-10 w-96 h-96 bg-brand-secondary/10 rounded-full blur-[100px]" />
-            </div>
-
+        <div className="min-h-screen bg-background relative pt-24 pb-12 overflow-hidden selection:bg-brand-primary selection:text-white">
             <Navbar />
 
-            <div className="container mx-auto p-6 max-w-7xl pt-24 relative z-10">
-                <header className="mb-10 flex flex-col md:flex-row justify-between items-end gap-4 border-b border-white/10 pb-6">
-                    <div>
-                        <h1 className="text-4xl font-bold text-white mb-2 flex items-center gap-3">
-                            Dashboard <span className="text-base font-normal px-3 py-1 bg-white/10 rounded-full text-brand-accent">Beta</span>
+            <main className="container mx-auto px-6 relative z-10">
+                <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+                    <div className="animate-fade-in" style={{ animationDelay: '0.1s' }}>
+                        <h1 className="text-5xl font-black text-[#111111] leading-tight tracking-tighter mb-2">
+                            DASHBOARD
                         </h1>
-                        <p className="text-gray-400">Track your career readiness & skill evolution</p>
+                        <p className="text-[#495057] font-medium text-lg">
+                            Elevating your career trajectory with precision AI.
+                        </p>
                     </div>
-                    {result && !showForm && (
+
+                    <div className="flex gap-3 animate-fade-in" style={{ animationDelay: '0.2s' }}>
                         <button
-                            onClick={() => setShowForm(true)}
-                            className="px-6 py-2 bg-white/5 border border-white/10 hover:bg-white/10 rounded-lg text-brand-accent font-medium transition-all"
+                            onClick={() => setShowHistory(true)}
+                            className="px-4 py-3 bg-[#F8F9FA] hover:bg-[#E9ECEF] border border-[#E9ECEF] rounded-xl text-[#495057] font-medium transition-all flex items-center gap-2"
                         >
-                            + New Assessment
+                            <History size={18} />
                         </button>
-                    )}
-                </header>
 
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                    {/* Left Col: Actions / Input */}
-                    <div className="lg:col-span-4 space-y-6">
-                        {showForm ? (
-                            <SkillAssessmentForm onComplete={(res) => {
-                                setResult(res);
-                                setShowForm(false);
-                            }} />
-                        ) : (
-                            <div className="glass p-8 rounded-2xl border border-white/10 shadow-xl relative overflow-hidden group">
-                                <div className="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
-                                    <Trophy size={100} className="text-brand-accent rotate-12" />
-                                </div>
-                                <h3 className="font-bold text-gray-400 uppercase tracking-widest text-xs mb-6">Current Role Analysis</h3>
-                                <div className="text-3xl font-bold text-white mb-4">{result.role}</div>
-
-                                <div className="relative inline-block mb-4">
-                                    <div className="text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-brand-primary to-brand-secondary">
-                                        {result.score}
-                                    </div>
-                                    <span className="text-2xl font-bold text-gray-500 absolute top-2 -right-6">%</span>
-                                </div>
-
-                                <p className="text-gray-400 text-sm">Overall Readiness Score</p>
-
-                                <div className="mt-8 pt-6 border-t border-white/10">
-                                    <div className="flex items-center gap-2 text-green-400 text-sm font-medium">
-                                        <CheckCircle2 size={16} /> <span>Analysis Complete</span>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Right Col: Results */}
-                    <div className="lg:col-span-8 space-y-6">
-                        {!result ? (
-                            <div className="glass p-16 rounded-3xl border border-white/10 border-dashed text-center">
-                                <div className="inline-flex items-center justify-center w-20 h-20 bg-brand-primary/10 rounded-full mb-6 animate-float">
-                                    <Sparkles className="text-brand-primary" size={32} />
-                                </div>
-                                <h3 className="text-2xl font-bold text-white mb-3">Ready to launch your career?</h3>
-                                <p className="text-gray-400 max-w-md mx-auto">Select a target job role on the left to instantly analyze your skills and get a personalized roadmap.</p>
-                            </div>
-                        ) : (
-                            <div className="animate-in fade-in slide-in-from-bottom-8 duration-700 space-y-6">
-                                {/* Charts & High Level */}
-                                <div className="glass p-6 rounded-2xl border border-white/10">
-                                    <div className="flex justify-between items-center mb-6">
-                                        <h3 className="font-bold text-white">Skill Profile Visualization</h3>
-                                    </div>
-                                    <div className="h-[300px] w-full flex justify-center items-center">
-                                        <SkillRadar data={getChartData()} labels={radarLabels} />
-                                    </div>
-                                </div>
-
-                                {/* Roadmap */}
-                                <div className="glass p-8 rounded-2xl border border-white/10">
-                                    <h3 className="font-bold text-2xl text-white mb-8 flex items-center gap-3">
-                                        <span className="w-1 h-8 bg-brand-secondary rounded-full"></span>
-                                        Personalized Roadmap
-                                    </h3>
-                                    <div className="relative border-l-2 border-white/10 ml-3 space-y-12 pb-4">
-                                        {result.roadmap.map((module: any, idx: number) => (
-                                            <div key={idx} className="ml-10 relative group">
-                                                <span className="absolute -left-[51px] bg-slate-900 border-2 border-brand-primary text-brand-primary rounded-full w-10 h-10 flex items-center justify-center font-bold shadow-[0_0_10px_rgba(99,102,241,0.3)] group-hover:shadow-[0_0_20px_rgba(99,102,241,0.6)] transition-shadow">
-                                                    {module.module}
-                                                </span>
-                                                <div className="p-6 bg-white/5 rounded-xl border border-white/5 hover:bg-white/10 transition-colors">
-                                                    <h4 className="text-xl font-bold text-white mb-2">{module.title}</h4>
-                                                    <p className="text-sm text-gray-400 mb-6 leading-relaxed">{module.description}</p>
-
-                                                    <ul className="space-y-3">
-                                                        {module.items.map((item: string) => (
-                                                            <li key={item} className="flex items-start gap-3 text-gray-300">
-                                                                <ArrowRight size={16} className="mt-1 text-brand-secondary min-w-[16px]" />
-                                                                <span className="font-medium text-sm">{item}</span>
-                                                            </li>
-                                                        ))}
-                                                    </ul>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            </div>
+                        {result && !showForm && (
+                            <button
+                                onClick={() => setShowForm(true)}
+                                className="group px-6 py-3 bg-[#F8F9FA] hover:bg-[#E9ECEF] border border-[#E9ECEF] rounded-xl text-[#495057] font-medium transition-all flex items-center gap-2"
+                            >
+                                <Sparkles size={18} className="text-brand-accent group-hover:rotate-12 transition-transform" />
+                                New Assessment
+                            </button>
                         )}
                     </div>
                 </div>
-            </div>
+
+                <HistorySidebar
+                    isOpen={showHistory}
+                    onClose={() => setShowHistory(false)}
+                    onSelect={(res) => {
+                        setResult(res);
+                        setShowForm(false);
+                        setShowHistory(false);
+                    }}
+                />
+
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+                    {/* Left Column: Input or Score Card */}
+                    <div className="lg:col-span-4 space-y-6 animate-fade-in" style={{ animationDelay: '0.3s' }}>
+                        {showForm ? (
+                            <div className="bento-card bento-blue bento-card-hover p-8 relative overflow-hidden h-full">
+                                <div className="absolute top-0 right-0 p-4 opacity-5">
+                                    <Sparkles size={120} />
+                                </div>
+                                <div className="relative z-10 h-full flex flex-col justify-between">
+                                    <div>
+                                        <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#111111] text-white rounded-full text-[10px] font-bold uppercase tracking-widest mb-6 border border-white/10">
+                                            <TrendingUp size={12} /> Live Analysis
+                                        </div>
+                                        <h2 className="text-3xl font-black text-[#111111] mb-4 tracking-tight leading-none uppercase">
+                                            Resume Tailor
+                                        </h2>
+                                        <p className="text-[#495057] mb-8 leading-relaxed max-w-md">
+                                            Optimize your professional profile for specific industry requirements using our high-precision AI engine.
+                                        </p>
+                                    </div>
+                                    <SkillAssessmentForm onComplete={(res) => {
+                                        setResult(res);
+                                        setShowForm(false);
+                                    }} />
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="bento-card bento-card-hover p-8 relative overflow-hidden group h-full">
+                                {/* Score Circle */}
+                                <div className="flex flex-col items-center justify-center py-8 relative">
+                                    <div className="relative w-48 h-48">
+                                        <svg className="w-full h-full transform -rotate-90">
+                                            <circle cx="96" cy="96" r={radius} stroke="currentColor" strokeWidth="8" fill="transparent" className="text-[#E9ECEF]" />
+                                            <circle
+                                                cx="96" cy="96" r={radius}
+                                                stroke="currentColor" strokeWidth="8"
+                                                fill="transparent"
+                                                strokeDasharray={circumference}
+                                                strokeDashoffset={progressOffset}
+                                                strokeLinecap="round"
+                                                className="text-brand-primary transition-all duration-1000 ease-out drop-shadow-[0_0_10px_rgba(99,102,241,0.5)]"
+                                            />
+                                        </svg>
+                                        <div className="absolute inset-0 flex flex-col items-center justify-center">
+                                            <span className="text-5xl font-black text-[#111111]">{result.score}</span>
+                                            <span className="text-xs text-brand-primary uppercase tracking-wider font-bold mt-1">Ready</span>
+                                        </div>
+                                    </div>
+
+                                    <h3 className="text-2xl font-bold text-[#111111] mt-6 mb-1 text-center">{result.role}</h3>
+                                    <div className="flex items-center gap-2 text-green-600 text-sm font-medium bg-green-100 px-3 py-1 rounded-full border border-green-200">
+                                        <CheckCircle2 size={14} /> Analysis Complete
+                                    </div>
+                                </div>
+
+                                <div className="space-y-4 mt-4">
+                                    <button
+                                        onClick={() => setIsInterviewOpen(true)}
+                                        className="w-full py-4 bg-gradient-to-r from-brand-primary to-brand-secondary rounded-xl text-white font-bold shadow-lg shadow-brand-primary/25 hover:shadow-brand-primary/40 hover:scale-[1.02] transition-all flex items-center justify-center gap-2 group/btn"
+                                    >
+                                        <Trophy className="group-hover/btn:animate-bounce" size={20} />
+                                        Start Mock Interview
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Skill Radar Mini-View */}
+                        {result && !showForm && (
+                            <div className="bento-card p-6 rounded-3xl animate-fade-in" style={{ animationDelay: '0.4s' }}>
+                                <h4 className="font-bold text-[#ADB5BD] text-xs uppercase tracking-widest mb-4">Skill Balancer</h4>
+                                <div className="h-[200px] w-full flex justify-center">
+                                    <SkillRadar data={getChartData()} labels={radarLabels} />
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Right Column: Content Feed */}
+                    <div className="lg:col-span-8 space-y-6">
+                        {!result ? (
+                            <div className="bento-gray p-12 rounded-3xl border-dashed border-2 flex flex-col items-center justify-center text-center animate-fade-in" style={{ animationDelay: '0.3s' }}>
+                                <div className="w-24 h-24 bg-brand-primary/10 rounded-full flex items-center justify-center mb-6 animate-pulse">
+                                    <Sparkles className="text-brand-primary" size={40} />
+                                </div>
+                                <h3 className="text-2xl font-bold text-[#111111] mb-2">Awaiting Assessment</h3>
+                                <p className="text-[#495057] max-w-md">Select your target role on the left to activate the AI analysis engine.</p>
+                            </div>
+                        ) : (
+                            <>
+                                {/* Market Ticker */}
+                                {result.market_analysis && (
+                                    <div className="animate-fade-in" style={{ animationDelay: '0.4s' }}>
+                                        <MarketPulse data={result.market_analysis} role={result.role} />
+                                    </div>
+                                )}
+
+                                {/* Job Portal */}
+                                {result.role && (
+                                    <div className="animate-fade-in" style={{ animationDelay: '0.4s' }}>
+                                        <div className="flex items-center justify-between mb-4">
+                                            <h2 className="text-2xl font-black text-[#111111] uppercase tracking-tight">Recommended Jobs</h2>
+                                            <span className="text-[10px] font-bold text-[#495057] bg-[#E9ECEF] px-2 py-1 rounded border border-[#DEE2E6] uppercase tracking-widest">AI Curated</span>
+                                        </div>
+                                        <JobPortal role={result.role} skills={result.skills_found || []} />
+                                    </div>
+                                )}
+
+                                {/* Resume Tailor */}
+                                {result.tailoring && (
+                                    <div className="bento-card p-8 relative overflow-hidden animate-fade-in" style={{ animationDelay: '0.5s' }}>
+                                        <div className="flex items-center justify-between mb-8 relative z-10">
+                                            <h3 className="font-black text-2xl text-[#111111] flex items-center gap-3 uppercase tracking-tight">
+                                                <div className="p-2 bg-brand-primary/10 rounded-lg text-brand-primary">
+                                                    <Sparkles size={20} />
+                                                </div>
+                                                Resume Smart-Tailor
+                                            </h3>
+                                            <div className="flex gap-2">
+                                                {result.tailoring.full_resume_data && (
+                                                    <button onClick={() => handlePrint()} className="px-4 py-2 bg-[#F8F9FA] hover:bg-[#E9ECEF] rounded-lg text-sm text-[#495057] font-bold border border-[#E9ECEF] transition-all flex items-center gap-2">
+                                                        <Download size={14} /> PDF
+                                                    </button>
+                                                )}
+                                                <button onClick={() => navigator.clipboard.writeText(result.tailoring.optimized_summary)} className="px-4 py-2 bg-brand-primary text-white rounded-lg text-sm font-bold transition-all flex items-center gap-2">
+                                                    <Copy size={14} /> Copy
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
+                                            <div className="space-y-4">
+                                                <div className="text-[10px] font-black text-[#ADB5BD] uppercase tracking-widest pl-1">Original Summary</div>
+                                                <div className="p-5 rounded-xl bento-gray border text-[#495057] text-sm italic leading-relaxed h-full">
+                                                    "{result.tailoring.current_summary}"
+                                                </div>
+                                            </div>
+                                            <div className="space-y-4">
+                                                <div className="text-[10px] font-black text-brand-primary uppercase tracking-widest pl-1 flex items-center gap-2">
+                                                    ATS Optimized
+                                                    <span className="px-1.5 py-0.5 bg-green-100 text-green-700 rounded text-[10px] uppercase font-bold">High Match</span>
+                                                </div>
+                                                <div className="p-5 rounded-xl bg-white border border-brand-primary/20 text-[#111111] text-sm leading-relaxed h-full relative overflow-hidden">
+                                                    "{result.tailoring.optimized_summary}"
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {result.tailoring.full_resume_data && (
+                                            <div style={{ display: 'none' }}>
+                                                <ResumeTemplate ref={componentRef} data={result.tailoring.full_resume_data} />
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+
+                                {/* Roadmap Link Card */}
+                                <div className="animate-fade-in" style={{ animationDelay: '0.6s' }}>
+                                    <div className="bento-card bento-card-hover p-10 relative overflow-hidden ring-1 ring-brand-primary/10 bg-gradient-to-br from-white to-[#F8F9FA]">
+                                        <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+                                            <div className="text-center md:text-left">
+                                                <div className="inline-flex items-center gap-2 px-3 py-1 bg-brand-primary/10 text-brand-primary rounded-full text-[10px] font-bold uppercase tracking-widest mb-4">
+                                                    Strategy Ready
+                                                </div>
+                                                <h4 className="text-3xl font-black text-[#111111] mb-2 tracking-tight uppercase leading-none">Your Career Path <br />is Optimized</h4>
+                                                <p className="text-[#495057] max-w-lg font-medium">
+                                                    We've engineered a step-by-step learning trajectory tailored to your identified skill gaps.
+                                                </p>
+                                            </div>
+                                            <a
+                                                href={`/roadmap?id=${result.id}`}
+                                                className="px-8 py-4 bg-[#111111] text-white rounded-xl font-bold hover:bg-black transition-all flex items-center gap-2 shadow-xl shadow-black/10 group/rd"
+                                            >
+                                                Launch Roadmap <ArrowRight size={20} className="group-hover/rd:translate-x-1 transition-transform" />
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <MockInterviewModal
+                                    isOpen={isInterviewOpen}
+                                    onClose={() => setIsInterviewOpen(false)}
+                                    jobRole={result?.role || 'Software Engineer'}
+                                />
+                            </>
+                        )}
+                    </div>
+                </div>
+            </main>
         </div>
     );
 }
