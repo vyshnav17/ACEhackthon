@@ -1,0 +1,92 @@
+[
+  {
+    "id": "1767846190604",
+    "userId": "1767846170139",
+    "roleId": "web-developer",
+    "date": "2026-01-08T04:23:10.604Z",
+    "score": 80,
+    "gaps": [
+      {
+        "skill": "React.js",
+        "category": "Technical",
+        "priority": "High"
+      }
+    ]
+  },
+  {
+    "id": "1767846276100",
+    "userId": "1767846170139",
+    "roleId": "web-developer",
+    "date": "2026-01-08T04:24:36.100Z",
+    "score": 100,
+    "gaps": []
+  },
+  {
+    "id": "1767846299224",
+    "userId": "1767846170139",
+    "roleId": "web-developer",
+    "date": "2026-01-08T04:24:59.224Z",
+    "score": 30,
+    "gaps": [
+      {
+        "skill": "JavaScript",
+        "category": "Technical",
+        "priority": "High"
+      },
+      {
+        "skill": "React.js",
+        "category": "Technical",
+        "priority": "High"
+      },
+      {
+        "skill": "Problem Solving",
+        "category": "Soft",
+        "priority": "Medium"
+      },
+      {
+        "skill": "Project Portfolio",
+        "category": "Portfolio",
+        "priority": "Medium"
+      }
+    ]
+  },
+  {
+    "id": "1767846557806",
+    "userId": "1767846170139",
+    "roleId": "cloud-engineer",
+    "date": "2026-01-08T04:29:17.806Z",
+    "score": 0,
+    "gaps": [
+      {
+        "skill": "AWS/Azure/GCP",
+        "category": "Technical",
+        "priority": "High"
+      },
+      {
+        "skill": "Linux Basics",
+        "category": "Technical",
+        "priority": "Medium"
+      },
+      {
+        "skill": "Docker/Kubernetes",
+        "category": "Tools",
+        "priority": "High"
+      },
+      {
+        "skill": "Networking",
+        "category": "Technical",
+        "priority": "Medium"
+      },
+      {
+        "skill": "Communication",
+        "category": "Soft",
+        "priority": "Medium"
+      },
+      {
+        "skill": "Cloud Certifications",
+        "category": "Portfolio",
+        "priority": "Medium"
+      }
+    ]
+  }
+]

@@ -1,0 +1,146 @@
+[
+    {
+        "id": "web-developer",
+        "title": "Web Developer",
+        "skills": [
+            {
+                "name": "HTML/CSS",
+                "category": "Technical",
+                "weight": 20
+            },
+            {
+                "name": "JavaScript",
+                "category": "Technical",
+                "weight": 25
+            },
+            {
+                "name": "React.js",
+                "category": "Technical",
+                "weight": 20
+            },
+            {
+                "name": "Git & GitHub",
+                "category": "Tools",
+                "weight": 10
+            },
+            {
+                "name": "Problem Solving",
+                "category": "Soft",
+                "weight": 10
+            },
+            {
+                "name": "Project Portfolio",
+                "category": "Portfolio",
+                "weight": 15
+            }
+        ]
+    },
+    {
+        "id": "data-analyst",
+        "title": "Data Analyst",
+        "skills": [
+            {
+                "name": "Python/R",
+                "category": "Technical",
+                "weight": 25
+            },
+            {
+                "name": "SQL",
+                "category": "Technical",
+                "weight": 25
+            },
+            {
+                "name": "Data Visualization (Tableau/PowerBI)",
+                "category": "Technical",
+                "weight": 20
+            },
+            {
+                "name": "Excel/Spreadsheets",
+                "category": "Tools",
+                "weight": 10
+            },
+            {
+                "name": "Critical Thinking",
+                "category": "Soft",
+                "weight": 10
+            },
+            {
+                "name": "Analytical Portfolio",
+                "category": "Portfolio",
+                "weight": 10
+            }
+        ]
+    },
+    {
+        "id": "cloud-engineer",
+        "title": "Cloud Engineer",
+        "skills": [
+            {
+                "name": "AWS/Azure/GCP",
+                "category": "Technical",
+                "weight": 30
+            },
+            {
+                "name": "Linux Basics",
+                "category": "Technical",
+                "weight": 15
+            },
+            {
+                "name": "Docker/Kubernetes",
+                "category": "Tools",
+                "weight": 20
+            },
+            {
+                "name": "Networking",
+                "category": "Technical",
+                "weight": 15
+            },
+            {
+                "name": "Communication",
+                "category": "Soft",
+                "weight": 10
+            },
+            {
+                "name": "Cloud Certifications",
+                "category": "Portfolio",
+                "weight": 10
+            }
+        ]
+    },
+    {
+        "id": "cybersecurity-analyst",
+        "title": "Cybersecurity Analyst",
+        "skills": [
+            {
+                "name": "Network Security",
+                "category": "Technical",
+                "weight": 25
+            },
+            {
+                "name": "Ethical Hacking",
+                "category": "Technical",
+                "weight": 20
+            },
+            {
+                "name": "Security Tools (SIEM, Firewalls)",
+                "category": "Tools",
+                "weight": 20
+            },
+            {
+                "name": "Risk Assessment",
+                "category": "Technical",
+                "weight": 15
+            },
+            {
+                "name": "Attention to Detail",
+                "category": "Soft",
+                "weight": 10
+            },
+            {
+                "name": "Security Certifications",
+                "category": "Portfolio",
+                "weight": 10
+            }
+        ]
+    }
+]
